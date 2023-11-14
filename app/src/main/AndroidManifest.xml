@@ -13,6 +13,12 @@
         android:theme="@style/Theme.App_Demo"
         tools:targetApi="31">
         <activity
+            android:name=".Fragments.HomeFragment.ObservationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Fragments.HomeFragment.EditHikeActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

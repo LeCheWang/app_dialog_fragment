@@ -1,66 +1,84 @@
 package com.example.app_demo.Fragments.HomeFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.app_demo.Models.Hike;
 import com.example.app_demo.R;
+import com.example.app_demo.databinding.FragmentHomeBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
+    FragmentHomeBinding binding;
+
+    List<Hike> hikes = new ArrayList<>();
+
+    HikeAdapter hikeAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
+
+        //fix cứng dữ liệu (sau này sẽ lấy dữ liệu này từ việc đọc trong database)
+        hikes.add(new Hike(1, "Son Dong", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+        hikes.add(new Hike(2, "Ha Noi", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+        hikes.add(new Hike(3, "Ba Vì", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+        hikes.add(new Hike(4, "Tam Đảo", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+        hikes.add(new Hike(5, "Đà Lạt", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+
+        //hiển thị lên danh sách bằng recycleView
+        hikeAdapter = new HikeAdapter(hikes, getActivity());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
+
+        binding.revHikes.setAdapter(hikeAdapter);
+        binding.revHikes.setLayoutManager(layoutManager);
+
+        hikeAdapter.setiOnClickHike(new IOnClickHike() {
+            @Override
+            public void iOnClickDelete(Hike hike, int position) {
+                hikes.remove(position);
+                hikeAdapter.setHikes(hikes);
+            }
+
+            @Override
+            public void iOnClickMore(Hike hike, int position) {
+                Intent intent = new Intent(getActivity(), ObservationActivity.class);
+                intent.putExtra("hike", hike);
+                startActivity(intent);
+            }
+
+            @Override
+            public void iOnClickDetail(Hike hike, int position) {
+                Intent intent = new Intent(getActivity(), EditHikeActivity.class);
+                intent.putExtra("hike", hike);
+                startActivity(intent);
+            }
+        });
+
+        return binding.getRoot();
     }
 }
