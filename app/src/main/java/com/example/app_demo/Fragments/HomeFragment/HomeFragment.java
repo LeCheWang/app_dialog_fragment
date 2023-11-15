@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.app_demo.Models.Hike;
 import com.example.app_demo.R;
+import com.example.app_demo.SqlHelper.SqlHelper;
 import com.example.app_demo.databinding.FragmentHomeBinding;
 
 import java.io.Serializable;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
-
+    SqlHelper sqlHelper;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -43,12 +44,14 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
 
+        sqlHelper = new SqlHelper(getActivity());
+        hikes = sqlHelper.getHikes();
         //fix cứng dữ liệu (sau này sẽ lấy dữ liệu này từ việc đọc trong database)
-        hikes.add(new Hike(1, "Son Dong", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
-        hikes.add(new Hike(2, "Ha Noi", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
-        hikes.add(new Hike(3, "Ba Vì", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
-        hikes.add(new Hike(4, "Tam Đảo", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
-        hikes.add(new Hike(5, "Đà Lạt", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+//        hikes.add(new Hike(1, "Son Dong", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+//        hikes.add(new Hike(2, "Ha Noi", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+//        hikes.add(new Hike(3, "Ba Vì", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+//        hikes.add(new Hike(4, "Tam Đảo", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
+//        hikes.add(new Hike(5, "Đà Lạt", "Ha Noi", "11-11-2023", true, 100, "HIGH", "đẹp lắm"));
 
         //hiển thị lên danh sách bằng recycleView
         hikeAdapter = new HikeAdapter(hikes, getActivity());
@@ -60,6 +63,7 @@ public class HomeFragment extends Fragment {
         hikeAdapter.setiOnClickHike(new IOnClickHike() {
             @Override
             public void iOnClickDelete(Hike hike, int position) {
+                sqlHelper.deleteHike(hike.getId());
                 hikes.remove(position);
                 hikeAdapter.setHikes(hikes);
             }
@@ -76,6 +80,25 @@ public class HomeFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), EditHikeActivity.class);
                 intent.putExtra("hike", hike);
                 startActivity(intent);
+            }
+        });
+
+        binding.btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hikes = sqlHelper.getHikes();
+                hikeAdapter.setHikes(hikes);
+            }
+        });
+
+        binding.tvDeleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i< hikes.size(); i++){
+                    sqlHelper.deleteHike(hikes.get(i).getId());
+                }
+                hikes.clear();
+                hikeAdapter.setHikes(hikes);
             }
         });
 

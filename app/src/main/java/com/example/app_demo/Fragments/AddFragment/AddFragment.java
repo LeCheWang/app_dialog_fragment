@@ -12,13 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.app_demo.Models.Hike;
 import com.example.app_demo.R;
+import com.example.app_demo.SqlHelper.SqlHelper;
 import com.example.app_demo.databinding.FragmentAddBinding;
 
 
 public class AddFragment extends Fragment {
 
-
+    SqlHelper sqlHelper;
     public AddFragment() {
         // Required empty public constructor
     }
@@ -34,6 +36,7 @@ public class AddFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add, container, false);
+        sqlHelper = new SqlHelper(getActivity());
 
         binding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,10 +75,13 @@ public class AddFragment extends Fragment {
                                     "\nAre you sure?"
                     );
 
+                    boolean finalIs_parking_available = is_parking_available;
                     builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getActivity(), "YES", Toast.LENGTH_SHORT).show();
+                            Hike hike = new Hike(name, location, "1111", finalIs_parking_available, 100, "dif111", "Des113");
+                            sqlHelper.insertHike(hike);
+                            binding.edtName.setText("");
                         }
                     });
 
